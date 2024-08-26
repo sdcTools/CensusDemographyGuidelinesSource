@@ -1,0 +1,198 @@
+\chapter{Overview of SDC Methods for Census and Demographic Tables}\label{ch:sdcmeth}
+\chaptermark{Overview of SDC Methods} % Short version of chapter name for the page headers
+
+Many methods are available to NSIs wanting to protect their demographic and census tables. While the myriad of available methods are all have their own qualities and characteristics, we can broadly divide them on two fronts: the type of noise they introduce, and where in the process these methods are applied. For the first characteristics, the type of noise we introduce with our disclosure control method, we distinguish between perturbative and non-perturbative. Perturbative methods alter the data by changing a cell value or an attribute of a record just enough in order to protect the respondents. Rounding is a simple example of a perturbative method. Non-perturbative methods do not alter the data, other than suppressing values that are deemed sensitive.
+
+The other characteristic is where in the process we apply our methods: we can choose to apply them before aggregating our data, or we can apply the method to the table that is to be published. When we apply our method to our data before aggregation we call the method pre-tabular, while alterations to the table itself are called post-tabular. Cell suppression is perhaps the most common post-tabular method. 
+
+Both axes have their advantages and disadvantages, and will differ on a method by method basis. Despite the abundance of methods available, there is not one perfect Statistical Disclosure Control method; not only because of the advantages and disadvantages for each method, but also because every NSI is dealing with different challenges, laws and demographics. 
+
+Despite this, the methods do offer general challenges and advantages, which we will outline in Section~\ref{section:comparison}. First, we will give a concise overview of methods in Section~\ref{section:overview}. An important factor in deciding which methods are suitable for protecting demographic tables is the software that can be used to apply these methods; this will be covered in Section~\ref{section:software-methodology}.
+
+
+\section{Current Methodology}\label{section:overview}
+
+As per the recommendations given in \cite{CROS-recommendations}, the common methods advised for the protection of the Census 2021 are the Cell Key Method and Targeted Record Swapping. Both methods rely on data perturbation. While the Cell Key Method is post-tabular, i.e. noise is added at the level of individual tables, Targeted Record Swapping is pre-tabular - its application leads to modifications in the micro-data.
+In May of 2023, a workshop was organised to allow countries to share their approach to the protection of the Census 2021 and discuss connected issues. Additionally, a survey was sent out to all participants. Out of the 30 responding countries, 10 countries are using (or intend to use) both the Cell Key Method and Targeted Record Swapping. 5 countries are only using Targeted Record Swapping, while 8 only use the Cell Key Method\cite{censusmethodsUNECE}. 
+
+As mentioned, not all countries decided to apply both CKM and TRS. Some applied only one, occasionally supplemented with other common statistical disclosure control methods. Other countries developed their own methodology. One example is the Multilevel Grids Method developed by INSEE\cite{censusmethodsUNECE,INSEE-mlg}. This method works for multiple levels of geographical grids. It works by aggregation of at-risk squares with other safe or unsafe squares until all groups contain more than a predefined number of households, working from the coarsest to the most detailed level. For more information, see \cite[~ch.5.1]{Guidelines1_GeoGL} as well as \cite{gridy} or \cite{INSEE-mlg}. Another example of countries developing their own methodology is the special variant of Small Count Rounding, which is explained in Section~\ref{section:small_count_rounding} below.
+
+Other methods like rounding or suppression, while applicable for Statistical Disclosure Control for demographic data, have not (yet) been widely applied to the Census 2021 data. These are however viable alternatives, or additions, to the disclosure control methods discussed above. Many more methods are available, as are variations on the methods mentioned. Due to time constraints, we will restrict ourselves to the most popular  methods for the protection of demographic data.
+Thereby, we notably leave out the very commonly used technique of Coarsening. One reason for not including it, is that harmonisation of European demographic statistics and European census statistics leads to prescribed details and formats of tables that have to be submitted to Eurostat. Hence, Coarsening is not a valid SDC method in those situations. On the other hand, for some national demographic statistics that are not harmonized at European level, it could be a valid method.
+
+We would also like to mention that often the application of a single SDC method is not sufficient. Each method implies its own (type of) information loss and each method targets a specific attacker scenario. See e.g. \cite{PietrzakEtal2022} for research on combining SDC methods, be it in a non-census setting.
+
+\subsection{Cell Key Method}    
+The \textbf{Cell Key Method} (CKM) is a method originally designed by ABS \cite{CKM_ABS}, implemented in R for the package \textit{cellKey} by \cite{cellkey_meindl} and implemented as an additional protection method in \targus since version 4.2.0 \cite{QuickRefTau42x}. The latter two implementations differ slightly from the implementation by ABS, see \cite{CKM_ABS} and \cite{cellkey_meindl}.
+    
+The Cell Key Method works for aggregation of microdata by assigning a uniformly drawn random number to each record in the microdata set, known as the record key. When a table is created by aggregation of the microdata, each cell in the table is assigned a cell key. This is done by aggregation of the record keys of all records belonging to the cell. Said cell key is then used to derive the additional noise from a predefined distribution, which is accessible through the so-called p-table. Therefore, two identical values of cell keys and cell values will give two identical amounts of noise to be added. 
+This method preserves consistency between tables due to the consistency of the record keys: if two cells in two different tables are the aggregation of the same records, the cell key will be made up by the same record keys and therefore have the same value. As a result, the noise is consistent between tables. See \cite{CKM_ABS} or \cite{cellkey_meindl} for a more in-depth explanation of the method.
+
+\subsection{Targeted Record Swapping}
+    
+\textbf{Targeted Record Swapping} (TRS) is a probabilistic, pre-tabular perturbative method for microdata with geographical components\cite{TRS_Shlomo}. It is designed as a special case of record swapping, where values of confidential attributes are exchanged between records. Targeted Record Swapping adds a geographical component that is used for deciding what attributes and records are swapped: households that are deemed at risk are swapped geographically with a similar household from a different region. 
+
+Which households or individuals are deemed at risk can be defined by the user. For example, households can be identified as at-risk when they contain an individual with a rare characteristic on a sensitive variable, such as religion or place of birth. The swapping method swaps households until both all at risk households are swapped and a predefined swap rate is achieved. If all at risk households are already eliminated while the swap rate is not yet achieved, the algorithm swaps regular households until the threshold is reached. Users of the method can define variables indicating similarity between households. The algorithm will then swap households that are `similar' according to these variables. See e.g.~\cite{TRS_Shlomo} for more information on this method.
+
+
+\subsection{Small Count Rounding} \label{section:small_count_rounding}
+\textbf{Small Count Rounding} is a perturbative method developed by Statistics Norway for frequency tables\cite{langsrudalgorithm}. This method assumes only small counts are deemed unsafe. It is designed to only round cells which contain small counts, up to a user-defined number, and reduce the amount of rounding necessary.
+
+The basic assumption is that inner cells on a low level are not published and hence the focus lies on the marginals. Now, for those marginals that are smaller than the predefined threshold, the underlying table and their inner cells (which stay unpublished) are considered and only the contributing counts are rounded, according to a specific algorithm. As the values in the underlying table represent frequencies of the unique combinations in the microdata, rounding these means changing the microdata to reflect the new frequencies. Tables created from this customised micro data set are additive and consistent. Further explanation and examples can be found in \cite{langsrudalgorithm}. 
+
+\subsection{Cell Suppression}
+
+\textbf{Cell suppression} is a common non-perturbative, post-tabular SDC method that is also frequently used in the protection of census or demographic tables. It reduces the detail in the tables locally by suppressing cells, without changing the data. Sensitive cells are `primary suppressed' and a number of safe cells are `secondary suppressed' to make precise recalculation difficult or even impossible. As this is a non-perturbative method, this does not affect safe cells, except those chosen for secondary suppression. Some NSIs chose not to publish entire aggregation levels if they cause issues for statistical disclosure control. 
+
+
+\subsection{Rounding} 
+
+\textbf{Traditional} and \textbf{controlled rounding} are common perturbative, post-tabular methods applied to magnitude and frequency count tables. While traditional rounding works by rounding each cell to its nearest rounding base and therefore in general sums of inner cell values do not match their corresponding marginals, controlled rounding \cite{controlledrounding} works by rounding the cells so that additivity is preserved. 
+Traditionally rounded tables may be made additive by adding up rounded cell values to the desired aggregated levels. 
+While controlled rounding might increase noise in individual cells, it decreases noise on the aggregated levels.
+
+\subsection{Controlled Tabular Adjustment}
+
+\textbf{Controlled Tabular Adjustment} (CTA) \cite{cta1, cta2} is another post-tabular, perturbative method that works by generating additive synthetic tables close to the original table, where the adjusted values of confidential cells are outside of an unsafe range. The table that is closest according to a chosen measure will be released instead of the unprotected table. The method by which the synthetic data table is achieved is by solving an optimization problem, usually using linear programming methodology. Various variants are available, such as Restricted controlled tabular adjustment (RCTA) as proposed in \cite{rcta}. Here adjustments to the true table are only allowed in a subset of all cells. This method allows users to control the noise more precisely. (R)CTA is applied on a per-table basis, and thus does not guarantee consistency between the tables.
+
+
+\section{Software Available for Current Methodology}\label{section:software-methodology}
+To be able to apply SDC methods to census and demographic tables in an efficient way, software is needed. For all previously mentioned methods such software is indeed available, be it as a method specific kind of software or as part of a general purpose kind of software. 
+
+All R-packages mentioned in this section are available on CRAN. Moreover, of all mentioned software except the R-package \texttt{SmallCountRounding} the source code and the latest releases can be found on \url{https://github.com/sdctools}. 
+
+For information how to use the software, we refer to the vignettes of the respective R-packages (on CRAN), to the manuals of \margus \cite{mumanual} and \targus \cite{taumanual} and to the quick references for TRS in \margus \cite{QuickRefMu} and CKM in \targus \cite{QuickRefTau42x}.
+
+\subsection{Method Specific SDC Software}\label{subsection:method-specifi-software}
+Method specific SDC software is software that is designed to apply one single SDC method to data. Often this kind of software is optimized for application of that particular method. A slight drawback can be that, since this kind of software can only apply one particular method, several different software packages are needed when looking for the optimal solution in terms of preserving utility. Method specific software for application of SDC methods to census and demographic tables is listed in Table~\ref{table:specificsoftware-methods}.
+\begin{table}[!htb]
+\begin{tabular}{lp{0.6\textwidth}}
+Software & Description\\\hline
+\texttt{SmallCountRounding} & R-package to apply Small Count Rounding\\
+\texttt{ptable} & R-package to produce p-tables for use in Cell Key Method\\
+\texttt{cellKey} & R-package to apply Cell Key Method\\
+\end{tabular}
+\caption{Method specific SDC software (R-packages on CRAN)}\label{table:specificsoftware-methods}
+\end{table}
+
+\subsection{General-purpose SDC Software}\label{subsection:general-purpose-software}
+General-purpose SDC software is software that facilitates the application of multiple methods to data. Moreover, it simplifies the process of applying different methods to the same data while comparing the effects on the remaining utility. A slight drawback can be that because of the general applicability, the software might not always yield the fastest implementation. General-purpose software for the application of SDC methods to census and demographic tables is listed in Table~\ref{table:generalsoftware-methods}.
+\begin{table}[!htb]
+\begin{tabular}{lp{0.7\textwidth}}
+Software & Included methods for census and demographic tables\\\hline
+\targus & Cell Key Method, Controlled Rounding, Controlled Tabular Adjustment, Cell suppression\\
+\texttt{sdcTable} & Cell suppression \\
+\margus & Targeted Record Swapping \\
+\texttt{sdcMicro} & Targeted Record Swapping
+\end{tabular}
+\caption{General-purpose SDC software. Names in \texttt{this font} are R-packages.}\label{table:generalsoftware-methods}
+\end{table}
+
+\subsection{An Overview of Software per Method}
+Table~\ref{table:method-sofware} gives an overview of which software is available to apply the methods mentioned in Section~\ref{section:overview}. 
+\begin{table}[!htb]
+\begin{tabular}{ll}
+Method & Software \\\hline
+Cell Key Method & \texttt{cellKey}, \targus \\
+Targeted Record Swapping & \texttt{sdcMicro}, \margus\\
+Cell suppression & \texttt{sdcTable}, \targus \\
+Small Count Rounding & \texttt{SmallCountRounding}\\
+(Controlled) Rounding & \targus \\
+Controlled Tabular Adjustment (CTA) & \targus
+\end{tabular}
+\caption{Available software per method. Names in \texttt{this font} are R-packages.}\label{table:method-sofware}
+\end{table}
+For application of the Cell Key Method, so called $p$-tables describing the distribution of the noise are needed. They should be specified in a certain format. The R-package \texttt{ptable}, available on CRAN, can be used to produce such $p$-tables for use in the method specific R-package \texttt{cellKey} as well as for use in the general purpose software \targus.
+
+\subsection{Embedding \targus in the Production Process}
+For use of \targus in a production process, \targus has the possibility to be called in batch-mode via commandline: \texttt{tauargus.exe foo.arb [log.txt]\ [temp-dir]\ [data-dir]}. Parameters in square brackets ``\texttt{[]}'' are optional: \texttt{foo.arb} is the name of the batch-file containing commands to be executed by \targus, \texttt{log.txt} is the name for the log-file, \texttt{temp-dir} is the file path for the directory where temporary files will be stored and \texttt{data-dir} is the file path where to find data files when not fully specified in the \texttt{.arb}-file. For more information see \targus \cite{taumanual}, section 5.7.
+
+This option can be used to call \targus from any production process that is able to run a program commandline. Examples are production processes in R, Python and SAS. For R, some packages are available to facilitate running \targus, like \texttt{rtaurgus} and \texttt{sdcTable}. They can be found at \url{https://github.com/sdcTools}. \texttt{sdcTable} is available through CRAN as well. For SAS some macros are available at \url{https://github.com/sdcTools/SAS2Argus}. For Python an experimental wrapper can be found at \url{https://pypi.org/project/piargus}.
+
+\section{Comparison of the SDC Methods}\label{section:comparison}
+
+% Different methods can be applied to protect Census tabular data, which consist of a large number of tables and grid tables. The table below represents several aspects of these methods. Simple execution, simple explanation, no perturbation, consistent protection and preservation of additivity are preferred.
+
+
+We have now covered a variety of Statistical Disclosure Control methods. In order to decide which of these methods are suitable for your own statistics, the following criteria might be useful. Some may seem more, some less important, also depending on a reader's perspective and experience. 
+
+\subsection{Decision Criteria}
+First of all, an SDC method should protect the data against \textbf{primary} disclosure, i.e. it must not be possible to directly identify rare or unique frequencies, in particular 1s and 2s, and by this identify respondents as well as their attributes. This may be the case, for example, if a frequency of 1 occurs or if all respondents (of a subgroup) fall in the same category and hence certain \textbf{group attributes} can be derived.
+
+Also, some \textbf{secondary} protection of confidentiality is needed, which assures that by doing some math (like through differencing and linking) protection of primary unsafe data cannot be undone. To this end the protection of all publications derived from the same data must be \textbf{harmonized}. Also, if third parties, like external researchers, are granted access to create their own analyses, it must be ensured, that the protection against disclosure of individual attributes is maintained.
+
+Of course, the Statistical Disclosure Control method of choice also needs to maintain \textbf{data quality}, such that the needs of the data users can be satisfied as far as possible. To provide a high accuracy, different SDC methods as well as different parameter choices for those methods should be checked systematically.
+
+A loss of \textbf{timeliness} due to the employment of an SDC method should be avoided by a far-sighted scheduling as far as possible. Furthermore, the choice of an SDC method should not complicate the process of combining, comparing and reconciling statistics of same origin.
+
+If an SDC method does not preserve \textbf{additivity} or \textbf{consistency} a clear communication with the users will be needed, since otherwise they might get confused. The more \textbf{complex} a Statistical Disclosure Control method is, the more detailed and transparent the methodology and its effects on the data must be described.
+
+To allow proper analysis of the data, \textbf{replicability} is needed, i.e. when using the same data basis and the same methods, analysis results need to be identical. In addition, one has to keep in mind, if users need to generate statistical outputs like multivariate analyses, grid data and time series it should be checked which Statistical Disclosure Control method fits the \textbf{scope}. Generally, if it should be possible to protect tabulations created flexibly on user demand, the SDC method should be \textbf{flexible} enough to even protect such additional analysis. The method should be easily applicable and ideally be carried out automatedly. This is also of importance if the data should be accessible from a \textbf{database} or from the \textbf{web}.
+
+Additionally, the method used should also be \textbf{cost-effective} and the \textbf{cost of implementation} should be taken into account accordingly. This includes the planning phase, in which, e.g. the parameters of the method must be defined, as well as any costs incurred for adapting the existing workflow or possibly programming an automated system. The latter may also result in a \textbf{standardised IT solution}, which can have a positive impact on other statistics as well. But you also have to consider the resulting \textbf{operating costs}, be it in terms of maintenance costs or the human resources required.
+
+The valuation of the criteria listed above can vary and be weighted differently depending on the prevailing situation and your own needs.
+
+
+\subsection{A Short Overview}
+For the SDC methods already explained, which could be used to protect the tabular data of the census, which consist of a large number of tables and grid tables, in Table~\ref{table:comp_sdc_methods} we show in a very abbreviated form how such a comparison of methods could look like using some of the aspects just mentioned. To simplify presentation, we sometimes only use partial aspects of these criteria, which can be categorised binary as ‘+’ and ‘$-$’. These are namely ‘simple to execute’ (as a partial aspect of operating costs), ‘simple to explain’ (as a partial aspect of complexity), ‘preserves consistency’, ‘preserves additivity’ and also add information about the kind of protection method (perturbative versus non-perturbative) and information loss (if large differences between original and published values are possible).
+
+In Table~\ref{table:comp_sdc_methods}, next to the already introduced shorthands CKM, TRS and CTA, we will use SCR for Small Count Rounding, CS for Cell Suppression, Round for Traditional Rounding and CRound for Controlled Rounding.
+
+\begin{table}[!th]
+\begin{adjustbox}{max height=8cm,max width=\linewidth,keepaspectratio}
+\begin{tabular}{lccccccc}
+%\hline
+  & CKM & TRS & SCR & CS & Round & CRound & CTA \\
+\hline
+Simple to execute       & + & + & $-$ & $-$ & + & + & $-$ \\
+%\hline
+Simple to explain       & $-$ & $-$ & $-$ & + & + & + & $-$ \\
+%\hline
+Data perturbation       & + & + & + & $-$ & + & + & + \\
+%\hline
+Preserves consistency   & + & + & +/$-$ & $-$ & + & $-$ & $-$ \\
+%\hline
+Preserves additivity    & $-$ & + & + & + & $-$ & + & + \\
+%\hline
+Large differences       & $-$ & + & $-$ & +/$-$ & $-$ & $-$ & + \\
+\hline\\
+\end{tabular}
+\end{adjustbox}
+\caption{Comparison of the SDC methods. A `+' means that the aspect mentioned applies, a `$-$' that it does not and a `$+/-$' that it applies to some extend.}
+\label{table:comp_sdc_methods}
+\end{table}
+Note that for Cell Suppression, the `$+/-$' on `Large differences' means that all \emph{published} cells are exact (no difference), but some cells are not published in which case only an approximating interval can be derived.
+
+\subsection{A Closer Look at the Methods}
+Methods which are simple to execute provide solutions for all kinds of tables; methods which are not simple to execute might have feasibility problems in case of large tables, complicated hierarchies, limitations (like, for example, some cells must not be suppressed).
+Cell Suppression, which can be used in a simple way for separate small tables, becomes a very challenging issue for a large number of linked tables. In practice, it is very difficult or impossible to ensure consistent protection among many large tables that are linked (e.g. Linked Tables - Modular in Tau-Argus can handle tables that have up to four dimensions, but only, if together they must not have more than ten different variables). Non-nested hierarchies for the same variable make the problem even more difficult to solve. Also, there might be a lot of suppressed cells in large tables.
+CTA can also be difficult to execute, because a feasible solution for a large, complex table might not be found.
+CKM is simple to use, because it is based on summing the record keys and finding the correct line in the perturbation table (based on the original value of the cell and the cell key).
+TRS is executed on microdata; after microdata are swapped, all the tables are prepared by aggregation.
+Traditional Rounding is simple to execute because each cell is rounded independently of the other cell. Controlled Rounding is more complicated because additivity has to be preserved.
+Small Count Rounding is not easy to execute for a large set of tables. Due to technical limitations of R, it might be difficult to handle large table sets with the Small Count Rounding algorithm. If a set of tables is too big to be protected straightforwardly, some tricks can be used to ensure that the model matrix doesn't exceed the limit, which is the maximum length of data vectors in R (e.g. input rows that can safely remain unchanged are removed).
+
+Cell Suppression is easy to explain, because the values of the suppressed cells are hidden and all the other cells have original values; primary suppressions are calculated using the chosen rules, and secondary suppressions are found by the chosen algorithm which minimises the chosen criterion (e.g. the sum of the suppressed cells) and ensures certain protection requirements.
+Traditional Rounding and Controlled Rounding are easy to explain because after the rounding all cell values are multiples of base b.
+On the other hand, CTA is hard to explain because values of sensitive cells are changed by the algorithm and protected cells are not visible at first glance in the published tables.
+CKM and TRS are even harder to explain, because random choices are included, and the usage of these methods has several consequences. In CKM, record keys are chosen randomly and perturbations are unbiased; consequently cell keys are random, the protection of each cell is independent of the other cells, additivity is lost; the user has to have some knowledge about probability in order to understand CKM. In TRS, the process of household swapping involves randomness; consequently the tables aggregated from the swapped data can have cells with values far from original values.
+Small Count Rounding is hard to explain because random choices are included and because the protection depends on the list of published cells.
+
+Cell Suppression is the only non-perturbative method in the table above; each cell value is either exact or suppressed (but for each suppressed value an interval on which the suppressed value lies can be calculated). Other methods show every table cell, but the values are perturbed (not exact) which can be a drawback (e.g. a user notices that the published value is not exact, consequently he doesn't trust the published data).
+
+Cell Suppression preserves additivity of the tables, but preserving consistency is much harder or impossible.
+CTA intrinsically preserves additivity, but the process is done independently for each table, so consistent protection among tables cannot be achieved in general.
+CKM protects each table cell randomly and independently of each other, so additivity is not preserved, but protection is consistent because random perturbation of a specific cell depends on the units which contribute to the cell (if two cells contain the same units, their perturbation is the same).
+TRS preserves additivity and consistent protection among tables, because all the tables are prepared by aggregation of perturbed microdata. 
+In Traditional Rounding, each cell is rounded independently, so the method is consistent, but not additive.
+In Controlled Rounding, additivity is necessary, but each table is rounded independently of the other tables, so consistency is not achieved in general.
+In Small Count Rounding, marginal cells are obtained by summing inner cells, therefore additivity is obtained. If tables are protected at the same time, consistent protection among the tables can be achieved, but with a lot of effort and for a limited set of tables.  It is good to note that protection is only guaranteed for those cells that were considered when creating the adjusted data set. Hence, when generating new tables that were not considered by the algorithm, those might show large deviations compared to their original counterparts or may even contain sensitive cells.
+
+Information loss due to suppression is different from information loss due to perturbation. But one should be aware that even unperturbed values are often actually estimates due to effects during data collection and compilation, and therefore not necessarily correct.
+In Cell Suppression, sum of suppressed cell values or number of suppressed cells is often minimised in order to minimise information loss.
+If CKM is used, the absolute amount of perturbation of each cell is limited strictly, controlled by a fixed parameter, which is helpful for analysis.
+In TRS and CTA the amount of noise can be influenced to some degree by suitable choice of the method's parameters and settings. This way the relative amount of noise for cells at higher aggregation levels can be kept at acceptable rates, but absolute amount of noise in such cells cannot be limited as strictly as with CKM.
+In Traditional Rounding, all the differences between original values and rounded values are small, because they can't be higher than half of base \textit{b}.
+If Controlled Rounding is used, a cell value is not always rounded to the nearest multiple of base \textit{b}, because additivity has to be preserved.
+Small Count Rounding tries to keep the protected values close to their original values.

@@ -1,0 +1,151 @@
+\chapter{Communication of SDC Methods to Data Users}\label{ch:comm}
+\chaptermark{Communication} % Short version of chapter name for the page headers
+
+The communication of statistical disclosure control (SDC) methods is not new, but has for a long time been primarily focused on non-perturbative methods such as suppression. It is however undeniable that the popularity of perturbative methods is growing. Because of the nature of these methods, communication of perturbative SDC methods is slightly different in its challenges. This chapter is thus applicable for all communication surrounding population statistics, but will focus especially on perturbative methods.
+
+\section{Introduction}
+Communication of SDC techniques and considerations to researchers and the public in general is an increasing priority in official statistics. Multiple challenges have been identified in communication surrounding SDC principles applied in the census 2021. First, it is vital that the value to preserve privacy is understood and shared within the NSI, between NSIs, and by the general public. Furthermore, SDC techniques can be perceived as (increasingly) advanced and obscure, which poses a challenge in the understanding what has been done and why. Also, there are some specific challenges that arise around communicating uncertainty in general which are also applicable to population statistics and specifically the census. 
+
+Epistemic uncertainty describes uncertainty about facts and numbers that could theoretically be known. Ideally, it can be quantified as some bandwidth in which we are fairly certain a number falls. This is the case for census numbers, as exact precision is generally not achieved, for example due to survey design, administrative errors, missing data, rounding errors etc. Taking in account SDC principles, another dimension is added in that it is not only impossible to eliminate uncertainty, but it may also not be fully desirable, as some minor imprecision might help protecting privacy of people. Uncertainty can even deliberately be added to data to obscure information and thereby preserve privacy. And the same confusing inconsistencies as rounding errors can arise when SDC techniques such as CKM are applied. 
+
+It is in all cases important to prepare communication of SDC principles in the census at different levels of detail for the intended audience. A useful and common practice is to identify persons to be able to adjust the message to the channel and targeted audience. For example, on social media a person might watch a short animation on the census and SDC techniques used, but in that context limited prior knowledge and a limited attention span must be assumed. In contrast, within an NSI, between NSIs, and between NSIs and researchers, a higher level of shared knowledge and focus is to be expected. It is essential to consider a communication strategy and keep your communication goals and targeted audience in mind when corresponding about census data and SDC techniques. 
+
+
+
+
+
+\section{Examples from Statistics Slovenia}
+
+
+
+\subsection{Communicating Usage of CKM}
+
+The Statistical Office of the Republic of Slovenia (SURS) has used the Cell Key Method (CKM) for protection of census grids. Thirteen statistics on 1 km$^{2}$ grids are prepared for European statistics. Additionally, various statistics for grids with 1 km, 500 m, and 100 m sides are prepared for national publication (total population, men, women, big age groups, 5-year age groups, education …) in a special application called STAGE: \url{https://gis.stat.si/#lang=en}.
+
+In STAGE, view and download enable adding explanations, but the policy is to include only essential explanations. When census grids were published, the decision was not to include explanation about the usage of the Cell Key Method. But later this decision was changed and explanation was included, because inconsistency and/or non-additivity effects of the usage of the Cell Key Method became obvious in the data, and had to be explained. Link to the general methodological explanation on Statistical Disclosure Control for tabular data was included (\url{https://www.stat.si/StatWeb/File/DocSysFile/9659/General_ME_Statistical_disclosure_control_for_tabular_data.pdf}).
+
+For example, there was feedback from a user who has noticed that total population differs from the sum of men and women in many grids in STAGE. The user asked if it is better to use protected total population or the sum of protected men and protected women. The answer is that, in general, it is better to use the protected total population, because maximum absolute difference between the original total population and the protected total population is D, while maximum absolute difference between the original total population and the sum of protected men and protected women is 2D.
+
+
+
+
+\subsection{Communicating Usage of Cell Suppression}
+
+SURS has suppressed some too detailed parts of tables for national publication (e.g. if the number of inhabitants in a settlement is lower than a threshold \textit{t}, information about their gender and age group is suppressed; but contrary, if the number of inhabitants in a settlement is equal to \textit{t} or higher, information about their gender and age group is given regardless of the distribution; secondary protection is also made). This suppression is different from the classical cell suppression method implemented in \targus and sdcTable. Suppressed cells are marked with \textit{z}, which is a common sign for confidential cells in all tables for national publication. No additional explanation was made.
+
+In general, there are few questions about confidential cells asked by the users. Each table has explanations for different statistical signs, among which there is \textit{z} with its explanation \textit{confidential}. Some users who seek data online and find confidential cells instead of numbers, write an email to the statistical office, claiming that the data are not available online and asking for the numbers. In such cases, suppression is explained to the users, and sometimes useful data are prepared (e.g. data on higher level that are not confidential). Some users that regularly use a specific table published online are unhappy if the table changes (e.g. until year 2020 there are no confidential cells, but when year 2021 is added there are some confidential cells for year 2021). In such cases, suppression is explained to the users, but it is very hard to persuade them that protection is indeed necessary.
+
+
+\section{Examples from Statistics Netherlands}
+
+Statistics Netherlands (CBS) has decided to accompany their publication of the 2021 EU census tables with three separate but connected publications. The first is a technical article covering the background of the census, the new Statistical Disclosure Control methods and some results \cite{CBS-ST}. This article is published on the CBS website for their series called "Statistical Trends". This series consists of long reads written by the researchers responsible for a statistic to give more information on the research process or provide more background and depth to the results. The target audience for these articles are users of the data and people with a more technical background who are interested in reading more about research conducted by CBS. The long read gives an overview of the two new methods used for the 2021 census (namely Targeted Record Swapping and the Cell Key Method) and discusses the impact the combination of these methods has on the published data. It does not mention parameters or other choices made by Statistics Netherlands in the protection process.
+
+The second publication is an online article written for the corporate website of Statistics Netherlands \cite{CBS-Corporate}. This article is an interview with some of the researchers involved with the Census 2021 and covers some noteworthy aspects of the current census. This article includes two paragraphs on the protection of the census, but does not mention specific methodologies. It does refer to the previous article for more information on the method. The target audience is the general public.
+
+The third publication is a video, which accompanies the aforementioned corporate article. This video has also been shared on the YouTube channel of Statistics Netherlands \cite{CBS-Youtube}. The target audience for this video is the general public, and the video is written in a way that is easy to understand for most Dutch speakers. The video is roughly 3 minutes and covers a number of topics: the history and necessity of the census, how the census is conducted virtually, the advantage of publishing in grids and how CBS keeps citizens' data safe. The topic of Statistical Disclosure Control is however covered only briefly in this video, and is kept without methodological details: there is only a brief mention of adding noise to the data in such a way that the results do not change too much. 
+
+
+
+
+
+
+
+
+
+
+\section{Examples from Official Statistics in Germany}
+
+
+
+The Federal and the State Statistical Offices of Germany use the Cell Key Method (CKM) to protect all of their publications for the 2021 Census. To this end a webservice was implemented to allow perturbation of data retrieved by users online and it was decided to also republish the data from the 2011 Census using the same webservice and hence changing the SDC method for those data from the method “SAFE” used so far for SDC of the 2011 Census data to CKM.
+
+To inform the users about this new SDC method and to also explain, why the old data got republished, on the official website of the German Census an information text is provided. The main point here is to explain the advantages of CKM to the prior SDC method “SAFE” and that republishing the old data with the new SDC method enhances comparability of the results of the two censuses.
+
+In addition, when data is analysed by Destatis for external parties, the results contain the following information text:
+
+\begin{mdframed}
+
+\textit{In order to maintain confidentiality in accordance with article 16 of the Federal Statistics Act (BStatG), a stochastic perturbative method, the Cell Key Method (CKM), is used for analyses based exclusively on demographic data, building and housing data, household data and family data. 
+For quality reasons, the individual values of a table row or column do not necessarily add up to the total shown.
+Results are only suppressed (represented in the tables with a dot) if the table - or parts of the table – comes with a too high risk of disclosure and/or too high loss of information.}
+
+\end{mdframed}
+
+
+The text on the official website explains to the users that although both "SAFE" and the Cell Key Method slightly change some of the frequencies shown in the published tables, compared to their original values, for CKM this deviation is comparatively low, on average. Furthermore, users get assured that the maximum absolute deviation is also low with this method, although they don’t get informed that this is due to the fact, that this value can be controlled. Additionally, original values of zero always remain unchanged, such that no implausible populations are created out of nothing. But of course, that also means that the results available in the 2011 census database may differ slightly from previous publications on the 2011 census due to the change in procedure. However, neither the quality of previously available publications nor the quality of the results available in this database are affected by the change in the confidentiality procedure.
+
+
+The readers also get informed that the Cell Key Method is applied only to results based exclusively on demographic data, building and housing data, household data and family data. Results obtained from a sample survey, e.g. on employment, education and training, do not require further protection, since extrapolation and subsequent rounding to a multiple of 10 immediately prevents any conclusions being drawn about individuals. 
+
+As an exception, the official population figures for all administrative territorial units (i.e. total inhabitants) are shown with the unchanged original value, since these have legal consequences. All other figures are considered confidential, and are only published after perturbation with CKM.
+
+A special feature of the way the data are presented is that due to the use of the Cell Key Method, the individual values of a table row or column do not necessarily add up to the total presented.
+This is illustrated using a simple example in which a subgroup of the population is categorised by age and gender:
+
+\begin{table}[!th]
+\begin{mdframed}
+
+\textit{The total value across all age groups for the characteristic "Male" presented in the first column of Table \ref{table:comm_destatis} is 175. However, if the corresponding table cells in the first row are added separately, their sum is 173 ($=20+31+32+40+50$). The total value across the entire table is shown as 371. However, if the values for "Male" and "Female" are added separately, they add up to 372 ($= 175 + 197$). The addition of the total values for all age groups ($47 + 56 + 71 + 86 + 109 = 369$) and the addition of all individual values in the table ($20 + 31 + 32 + 40 + 50 + 25 + 25 + 40 + 45 + 60 = 368$) also result in slightly different sums than the total value presented.
+}
+
+\hfill \break
+\centering
+\begin{adjustbox}{max height=8cm,max width=\linewidth,keepaspectratio}
+\begin{tabular}{|l|c|c|c|c|c|c|}
+
+\hline
+\multirow{2}{*}{Sex} & \multirow{2}{*}{Total} & \multicolumn{5}{c|}{Age}\\
+\cline{3-7}
+ &  & $<$18 & 18 to 29 & 30 to 49 & 50 to 64& $\geq$65\\
+\hhline{|=|=|=|=|=|=|=|}
+Male & 175 & 20 & 31 & 32 & 40 & 50 \\
+\hline
+Female & 197 & 25 & 25 & 40 & 45 & 60 \\
+\hline
+Total & 371 & 47 & 56 & 71 & 86 & 109 \\
+\hline
+\end{tabular}
+\end{adjustbox}
+\caption{Example: Frequency by age and gender.}
+\label{table:comm_destatis}
+
+
+\end{mdframed}
+\end{table}
+
+It is brought to the readers’ attention that this effect is a direct consequence of the Cell Key Method and ensures in addition to the confidentiality of each individual’s information the highest possible data quality. It is pointed out to the users that, whenever they need high accuracy in the aggregated data and in order to avoid small deviations to the official figures (the "official figures" are in fact the perturbed figures after application of CKM, published on the official census data base web-site of Destatis) they should use the census data base of Destatis since generating sums or differences from already perturbed results may possibly lead to larger deviations from the original results.
+
+Another topic is the impact of CKM on statistical indicators like proportions.
+
+\begin{mdframed}
+
+\textit{Many interesting indicators for statistics are based on frequency counts. These include, as is now available for the 2011 census, proportions. These values are calculated using the slightly perturbed frequencies, which means that the respective results may deviate slightly from the corresponding original values. The procedure prevents conclusions about individual data and at the same time ensures the highest possible quality of results. A correction mechanism also prevents implausible results (like proportions larger than 100\%). 
+}
+
+\end{mdframed}
+
+
+In addition, when using the census database,  users get warned, when statistical indicators are of low reliability. This may happen when the underlying frequencies are very small, since in that case even small absolute deviations from the original values may lead to large relative deviations. So, if certain figures have a low reliability, they are shown in brackets. Hence, again, users are advised instead of performing own calculations on the noisy data, to use the census data base of Destatis for obtaining the data, to ensure a higher accuracy, to prevent implausible results and to receive such additional information on data quality.
+
+Furthermore, for any interested readers a link to an article about disclosure control in German university statistics is given, where the Cell Key Method is described in greater detail.
+
+
+
+
+
+
+\section{Examples from Statistics Austria}
+
+
+Statistics Austria uses Targeted Record Swapping (TRS) to protect tables of the 2021 Census. Since this method was already used for their publications of the 2011 Census, there are now several informative texts on this topic. These texts provide information on the advantages of this method, such as consistency and maintained additivity, as well as the universal applicability of this method, including for special analyses and, of course, the comprehensibility of the procedure for users.
+
+For the 2011 Census Statistics Austria produced a document to inform about the methodology of TRS \cite{StatAT_TRS}. It explains to users that so-called "risky records" are searched for first, i.e. data records that represent a rare combination in the data set due to their combination of characteristics and hence can be identified by a possible data attacker easily. Then for each of these risky records a suitable partner (B) is searched for in the remaining data, with which individual characteristics are swapped. So, instead of making two respondents change places, only some of their characteristic features get swapped. Of course, this may lead to some issues, but the reader gets assured that Statistics Austria is aware of those and took sufficient care of it. Hence it is pointed out, that it is of high importance to identify in advance which characteristics can be replaced arbitrarily and which cannot. An example given is the age which cannot be exchanged independently from the employment status without generating implausible data. Hence age categories have been defined and swapping partners are only searched within the same age groups. A simple example is used to illustrate to readers what TRS does with two selected swapping partners, but, for reasons of confidentiality, it is not stated explicitly which characteristics are chosen to be swapped in the real use case and which parameters are used. However, it is explained that, depending on the choice of characteristics to be swapped, inconsistencies/biases may occur in the data in the course of Targeted Record Swapping. For this reason, all changes are checked with the help of extensive analyses (explained within the document) in order to adjust or change the characteristics to be swapped if necessary.
+
+For the 2021 Census further online publications have been produced, in which users are also (but not only) informed about TRS: One shows population results from the register census \cite{StatAT_Zensus} and the other is a documentation on definitions, explanations, methods and quality \cite{StatAT_Metainformationen}.
+
+Here the sections about TRS are rather short, giving an easy to understand overview for the broad readership instead of focussing too much on technical details. The main focus is on reassuring users that data protection is taken seriously, while at the same time data quality is maintained through appropriate measures. Hence Statistics Austria emphasises that the protection of personal data is one of their central concerns. It is explained in general terms that by TRS the data gets partially “soiled” to prevent the identification of individual units, so in case of smaller cell populations the data should be interpreted with caution. Yet users are assured that particular attention was paid to the quality assessment of the generated results and that care is taken to ensure that the most important key figures are unbiased. It is emphasised that important advantages of TRS over other data protection measures are that additivity and consistency of the tables is maintained, and that the possibility of subsequent analyses is given at any time without the need for further measures such as the suppression of individual values, and without the risk of the results contradicting each other. This makes further usage by users easy.
+
+
+
+
+

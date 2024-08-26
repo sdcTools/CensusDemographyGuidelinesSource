@@ -1,0 +1,101 @@
+\chapter{Defining Parameters}\label{ch:params}
+\chaptermark{Defining Parameters} % Short version of chapter name for the page headers
+In general there are no guidelines or best practices with regard to choosing the parameters for TRS and CKM. There are however multiple ways of coming to a decision on which parameter values to settle on. This chapter is intended to provide readers with recommendations that can be taken into account when selecting parameters.
+
+\section{Parameter Definition by Trial and Error}
+One of those methods to decide on  which parameter values to settle on is by way of trial and error. Because there are no risk measures yet defined for the \textit{combination} of TRS and CKM, this currently seems to be the best method available to NSIs that use the combination of these methods. This section will delve into some examples which can guide the choice of the parameters. 
+
+First we delve into an example from Statistics Netherlands (SN). For TRS, first an assessment was made of how many households were at risk using the risk parameters deemed most relevant by SN. These were variables that were most sensitive if a person in the household had a less common value for it. This gave a minimum swapping rate; the method will have to swap at least this amount of households. Note that even using a lower swapping rate would swap all at-risk households, as the method is designed to continue at least until all at-risk records are swapped. However, the intention was to create more uncertainty by allowing the method to also swap records which were not deemed at-risk. It is also helpful to know the percentage of at-risk households in order to understand the results of the method; if a low swap rate is set but a larger percentage of households are swapped during the procedure, this low swap rate could give a misleading impression. SN chose to compare three values for the swapping parameter, combined with different options for CKM. The comparison of the different settings was done by utility and security experts. 
+
+It is important to note that SN used similarity profiles to apply TRS, so as to keep the aggregation of certain variables used in the similarity profiles similar even when households in regions were swapped. For example, using household size as a similarity profile variable can assure that only households of the same size are swapped, thus not affecting the number of people in a certain area. It is also possible to apply multiple similarity profiles, for when no full matching households are available; if no households are found for the largest similarity profile, matching households can be found using less strict criteria. These options can be used to influence the effect TRS has on the aggregates. 
+
+For CKM a number of different p-tables were used to evaluate the resulting tables on the sensitivity and utility aspects. The parameters for a p-table are the maximum difference between the original and the resulting cell value, the variance of the added noise and a parameter which can be used to block certain small counts (like 1's and 2') from appearing in the output tables. Several values of the maximum cell difference and of the blocked small counts were tested. The variance was tested at the smallest value possible given the other parameters of the p-table. By that, the perturbed cell values could be as close as possible to the original ones. But also larger values of the variance were tested. For instance, excluding cell values 1 and 2 resulted in seemingly no sensitive cells in the output tables, whereas excluding only value 1 resulted in apparent unsafe cells with value 2. In all cases the resulting cell values, in particular cell values 1 or 2, may or may not be the original cell values, so these `unsafe' cells are not deducible with certainty to 1 or 2 persons in the population, so they are still protected.
+
+\subsubsection{Analyses of Results}
+Statistic Netherlands applied both methods: first TRS to the microdata and then CKM to the aggregated data for the 2021 census hypercubes and grid cells. For TRS \margus was used and for CKM \targus with calls from R-scripts. The R-script for the CKM protection uses as input hypercube definitions provided by the user as Excel file. The R-script derives the Argus meta data files and Argus batch files, and automatically subsequently calls \targus so that all hypercubes are produced successively in one run. The resulting output tables were analysed and evaluation files were derived in R and saved as a csv-file that could easily be imported in Excel. A large number of evaluation measures were computed, utility and safety measures, besides a number of general table characteristics. During the project several evaluation variables were tested and adjusted if needed using other characteristics to evaluate the quality of the resulting hypercubes. Also the TRS output was analysed, to differentiate its effect on the output tables from the application of the CKM method. All measures were derived for the tables both including and excluding the table marginals, for the original hypercubes (i.e. without TRS and CKM), for the hypercubes after TRS but without CKM, and for the hypercubes after both TRS and CKM. To give an idea of measures, we give the following examples, for each hypercube characterised by its number, number of cells, and variables including hierarchies, e.g. hypercube 3.1, variable names GEO.H, SEX, AGE.M, number of table cells 14784. 
+
+\begin{itemize}
+\item General table characteristics, examples
+\begin{itemize}
+\item Table number
+\item Table variables, including hierarchy level
+\item Number of table cells
+\item Number of zero cells: original, after TRS, after TRS and CKM
+\item Total of all cell values: original, after TRS, after TRS and CKM
+\item Minimum and maximum cell value: original, after TRS and CKM
+\end{itemize}
+\item Safety characteristics, examples
+\begin{itemize}
+\item Number of unsafe cells: original, after TRS, after TRS and CKM
+\item Relative number of unsafe cells: original, after TRS, after TRS and CKM
+\end{itemize}
+\item Utility characteristics, examples
+\begin{itemize}
+\item Maximum of all cell values: original, after TRS, after TRS and CKM
+\item Mean and median of all table cell values: original, after TRS and CKM
+\item Maximum cell value: original, after TRS and CKM
+\item Total of all cell values: original, after TRS, after TRS and CKM
+\item Relative number of table cell values equal to original value: after TRS, after TRS and CKM
+\end{itemize}
+\end{itemize}
+
+These measures were collected in one Excel sheet for all hypercubes. The utility and risk of each table was evaluated. Other characteristics could easily be added in the R-code script, and then run for the set of hypercubes. Also different p-tables could easily be applied and the script be run again. For 32 hypercubes and 103 tables it took for the Dutch population about two hours to process and evaluate, using a standard Statistics Netherlands virtual Windows 11 computer, Intel Xeon Gold 6146 CPU (3.2 GHz), 3 cores, 12 GB RAM.
+
+\section{A Deeper Look at the Parameters of the Cell Key Method}
+
+The Cell Key Method (CKM) is a perturbative disclosure control method and creates uncertainty about the true cell values to protect them.
+
+To carry out the actual perturbation, the CKM relies on a so-called perturbation table, or p-table for short. In this table, all the necessary information is stored to assign a unique perturbation value for each combination of original value and the eponymous cell key. By this, consistency across tables is guaranteed.
+
+It is important to choose the p-table such that the uncertainty it creates on the one hand is large enough to protect sensitive cells and on the other hand is small enough to maintain reliable data. Hence a balance must be found between information loss and disclosure risk, and the evaluation of these two aspects may vary from case to case.
+
+To create a suitable perturbation the freely accessible R-package \textit{ptable} can be used, which is based on a maximum entropy approach as described for example in \cite{discrisk_giessing_psd2016}. In order to adapt the perturbation table to our needs, parameters such as the maximum deviation and the variance of the perturbation value must be set by the user. The choice made should always be reviewed for these two aspects by means of appropriate tests before CKM is used in practice.
+
+\subsubsection{Including High-Risk Scenarios in Considerations}
+
+Defining the parameters for the Cell Key Method always is a process that needs review and rectification. One of the main risks when it comes to the Cell Key Method is disclosure by differencing, as with any non-additive SDC method.
+
+Since the noise of each cell is added independently, the deviation between original values and perturbed values can be controlled very strictly by the maximum deviation parameter $D$. This enhances the quality of the perturbed data, compared to mechanisms that modify values on the lowest level and then sum up all these deviations with each aggregation step. But this also means the results are not additive anymore. So by adding two perturbed values in most cases we will get a result that differs from the perturbed sum of the original values and an attacker can use this to their advantage in rarely occurring cases and sparse tables.
+
+A typical example of a disclosable constellation is the following: 
+Suppose an intruder is aware that the maximum deviation used is $D=2$, and they also know that zero counts are never changed to non-zero counts. Now imagine a table row, which consists of two original counts of 1 each (resulting in an original margin of 2). Suppose both 1s remain unchanged, and the margin 2 is perturbed to 0, as shown in table \ref{ckm_ex_tab}.
+
+\begin{table}[!th]
+\centering
+\begin{adjustbox}{max height=8cm,max width=\linewidth,keepaspectratio}
+\begin{tabular}{|l|c|c|c|}
+
+\hline
+  & Inner Cell 1 & Inner Cell 2 & Margin \\
+\hline
+Original & 1 & 1 & 2 \\
+\hline
+Perturbed & 1 & 1 & 0 \\
+\hline
+\end{tabular}
+\end{adjustbox}
+\caption{Example for a table row before and after perturbation.}
+\label{ckm_ex_tab}
+\end{table}
+
+If an attacker now knows the maximum deviation $D$, they can identify a range for each published value from which the corresponding original value must originate. So in our example they can conclude the margin must be at most 2 and the original interior values must both be 1. Since otherwise this would result in a margin greater than 2.
+
+Now during the conception phase the probability that for a combination of original values as depicted above we end up with such a disclosable result can be computed easily. One just needs to look up the corresponding probabilities for each contributing cell of such an event in the p-table and multiply those to get a - for this purpose usually sufficiently precise - upper bound for the event to occur\footnote{due to dependencies between its factors, the product of will be an upper bound of the event probability only}.
+By doing this for multiple risky cells value combinations, we achieve a risk indicator for a given set of parameters. This allows us to compare multiple parameter sets.
+
+If we want to reduce the likelihood of the above described scenario, we must be aware of the following: The probabilities of an original 2 turning into a zero and of an original 1 staying a 1 need to be small. Hence it is advantageous to raise the maximum deviation and to construct the perturbation table in a way such that the probability of an original frequency to remain unperturbed is rather low. In addition, lowering the variance makes ‘extreme’ deviations (like adding or subtracting the maximum possible deviation) also less likely.
+Yet, if both the variance and the maximum deviation are very low, very little perturbation will be carried out and hence the protective effect is low as well. So, the choice of the maximum deviation and of the variance need to be harmonised. Here we need to keep in mind that a higher variance should be accompanied by a higher maximum deviation, otherwise the value of maximum deviation will be reached too often. In any case, it is highly relevant not to set the maximum deviation $D$ too low. In addition, this example shows, that the exact value $D$ should never be published, since it is a valuable information for any attacker.
+
+It is possible to obtain a more elaborate measure, if we also include the probability that a risky combination of values like in the above example occurs at all. For further insights we would like to refer the interested reader to \cite{ckm_enderle_psd2020}.
+
+%Of course, we also have to consider the probability that a combination of original values like the one described above occurs at all. Otherwise we worry about disclosing a special case that may never arise. So we need to identify the most typical constellations $C_1, C_2,\ldots$ of original interior cell combinations, for which a perturbation result as risky as described above, can possibly occur. If we multiply these two probabilities, we get a risk indicator for a proposed p-table, as described in \cite{ckm_enderle_psd2020}. However, this indicator only serves as a reference for comparing two parameterisations.
+
+While the previous example illustrates a risk related to the prevalence of specific value constellations in the table set,
+%($C_1, C_2,\ldots$ above)
+there are more generic properties of CKM protected table sets (i.e.\ not depending on specific constellations) that may be exploited in principle to try to disclose $D$ and ultimately reconstruct original table values. For instance, Section~3 of \cite{ckm_bach_2021} shows how attack methods that rely on generalised margin exploits or on the redundancy of information in large table sets (`massive averaging') can be used for a systematic, quantitative assessment of CKM parameter values.  The analysis of \cite{ckm_bach_2021} results in interdependent risk constraints on the CKM parameters $D$ and $V$ (variance) tailored to the specific table set to be released.
+
+Alternatively, computation of feasibility intervals (cf. \cite{sdc_wiley} , 4.3.1) for the original counts is suggested, e.g. in \cite{ckm_enderle_psd2018}.
+By using methods like linear programming, these intervals can be determined for each cell of interest. To do this, a variable representing the value of the cell is minimised and maximised, subject to a series of constraints representing the "logical" table relationships as well as some a priori upper and lower bounds for unknown cell values.
+This approach can be used to assess disclosure risks resulting from this kind of attack for a given parameter set. By executing the "attacks" with different values for the parameter sets we can compare the suitability of the corresponding p-tables with respect to this aspect of disclosure risk. 
+The final parameter set can then be determined, taking into account the loss of data utility. The latter could be evaluated by comparing the original and the perturbed table, using information loss metrics based on, e.g. average distances or Hellinger's distances \cite[ch. 4.7.2 and 5.8]{HundepoolEtAl2024}.
+
